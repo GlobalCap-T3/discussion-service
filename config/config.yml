@@ -1,0 +1,14 @@
+dev:
+  elasticsearch:
+    protocol: http
+    host: localhost
+    port: 9200
+    index: discussion
+    mapping:
+      properties:
+        title:
+          type: keyword
+        content:
+          type: text
+        user_id:
+          type: keyword
