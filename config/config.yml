@@ -1,14 +1,18 @@
 dev:
   elasticsearch:
-    protocol: http
-    host: localhost
-    port: 9200
-    index: discussion
+    host: !ENV ${ELASTIC_HOST:localhost}
+    port: !ENV ${ELASTIC_PORT:9200}
+    index: !ENV ${ELASTIC_INDEX:discussion}
     mapping:
       properties:
         title:
-          type: keyword
+          type: text
         content:
           type: text
         user_id:
           type: keyword
+
+  authentication-service:
+    host: !ENV ${AUTHEN_HOST:localhost}
+    port: !ENV ${AUTHEN_PORT:5000}
+    prefix: /v1/auth
