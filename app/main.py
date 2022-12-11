@@ -14,15 +14,7 @@ def init_logging():
     logging.config.dictConfig(config)
     return config
 
-
-def load_config():
-    env = os.getenv("SERVICE_ENV", "dev")
-    config = parse_config("config/config.yml").get(env)
-    return config
-
 async def on_startup():
-    config = load_config()
-    endpoints.init_config(config)
     await endpoints.init_db()
 
 def create_app():

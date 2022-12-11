@@ -1,9 +1,16 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class DiscussionCreate(BaseModel):
-    user_id: str
     title: str
     content: str
 
+class Discussion(DiscussionCreate):
+    user_id: str
+
 class DiscussionCreateResponse(BaseModel):
     id: str
+
+class DiscussionSearchResponse(BaseModel):
+    id: str = Field(..., alias="_id")
+    score: str = Field(..., alias="_score")
+    source: Discussion = Field(..., alias="_source")

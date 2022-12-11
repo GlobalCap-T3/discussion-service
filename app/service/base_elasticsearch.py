@@ -1,5 +1,5 @@
 from logging import getLogger
-from elasticsearch import AsyncElasticsearch
+from elasticsearch import AsyncElasticsearch, NotFoundError
 
 logger = getLogger(f'uvicorn.{__name__}')
 
@@ -19,6 +19,20 @@ class BaseElasticSearch():
 
     @classmethod
     async def get(cls, client: AsyncElasticsearch, _id: str):
-        response = await client.get(index=cls.index, id=_id)
-        logger.debug("[srv] %s get response %s.", cls.__name__, response)
-        return response.body.get("_source", {})
+        try:
+            response = await client.get(index=cls.index, id=_id)
+            logger.debug("[srv] %s get response %s.", cls.__name__, response)
+            return response.body.get("_source", {})
+        except NotFoundError as e:
+            logger.debug("[srv] ES not found error %s", e)
+
+    @classmethod
+    async def search(cls, client: AsyncElasticsearch, query_str: str, fields: list[str]):
+        query = {
+            "combined_fields": {
+                "query": query_str,
+                "fields": fields
+            }
+        }
+        response = await client.search(index=cls.index, query=query)
+        return response.body.get("hits", {}).get("hits", [])
