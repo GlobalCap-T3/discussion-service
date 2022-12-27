@@ -1,3 +1,7 @@
+import os
+from pyaml_env import parse_config
+
+from .authentication_ep import AuthenticationService
 from .elasticsearch import ElasticSearch
 
 class Singleton:
@@ -9,9 +13,16 @@ class Singleton:
 class EndpointsManager(Singleton):
     def init_config(self, config):
         self.elasticsearch = ElasticSearch(config)
+        self.authentication_ep = AuthenticationService(config)
 
     async def init_db(self):
-        await endpoints.elasticsearch.init_db()
-        await endpoints.elasticsearch.init_index()
+        await self.elasticsearch.init_db()
+        await self.elasticsearch.init_index()
+
+def load_config():
+    env = os.getenv("SERVICE_ENV", "dev")
+    config = parse_config("config/config.yml").get(env)
+    return config
 
 endpoints = EndpointsManager()
+endpoints.init_config(load_config())
