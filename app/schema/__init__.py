@@ -12,5 +12,5 @@ class DiscussionCreateResponse(BaseModel):
 
 class DiscussionSearchResponse(BaseModel):
     id: str = Field(..., alias="_id")
-    score: str = Field(..., alias="_score")
+    score: float = Field(..., alias="_score")
     source: Discussion = Field(..., alias="_source")

@@ -66,6 +66,25 @@ class ElasticSearch():
         )
         logger.debug("[db] ES create default data template response %s.", response)
 
+        pipeline = {
+            "description": "Set create time and update time.",
+            "processors": [
+                {
+                    "script": {
+                        "source": """
+                            def now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                            ctx["update_at"] = now;
+                            if (!ctx.containsKey('created_at')) {
+                                ctx['created_at'] = now;
+                            }
+                        """,
+                        "if": f"ctx['_index'].contains('{__idxprefix__}')",
+                    }
+                }
+            ],
+        }
+        self.client.ingest.put_pipeline(**pipeline)
+
     async def init_index(self):
         # Check if index already exists
         if await self.client.indices.exists(index=self.index):
